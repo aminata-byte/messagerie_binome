@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<StackPane style="-fx-background-color: #0d0d1a;"
+           xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.example.application_messagerie.client.controller.LoginController">
+
+    <!-- Carte centrée automatiquement -->
+    <VBox alignment="CENTER"
+          spacing="15"
+          prefWidth="420"
+          maxWidth="420"
+          style="-fx-background-color: #1a1a2e;
+                 -fx-background-radius: 20;
+                 -fx-padding: 40;">
+
+        <!-- Icône -->
+        <StackPane prefHeight="64" prefWidth="64"
+                   maxWidth="64"
+                   style="-fx-background-color: #D99177;
+                          -fx-background-radius: 15;">
+            <ImageView fitHeight="50" fitWidth="50"
+                       pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@../../../../java/com/example/application_messagerie/images/message.png"/>
+                </image>
+            </ImageView>
+        </StackPane>
+
+        <!-- Titre -->
+        <Text fill="#fcf9f9" text="Messagerie Interne">
+            <font><Font size="27.0"/></font>
+        </Text>
+
+        <!-- Champ nom d'utilisateur -->
+        <TextField fx:id="usernameField"
+                   prefHeight="55" maxWidth="370"
+                   promptText="Nom d'utilisateur"
+                   style="-fx-background-color: #224037;
+                          -fx-text-fill: #F2F2F2;
+                          -fx-prompt-text-fill: #6a8a80;
+                          -fx-background-radius: 10;
+                          -fx-padding: 12;">
+            <font><Font size="18.0"/></font>
+        </TextField>
+
+        <!-- Champ mot de passe -->
+        <PasswordField fx:id="passwordField"
+                       prefHeight="55" maxWidth="370"
+                       promptText="Mot de passe"
+                       style="-fx-background-color: #224037;
+                              -fx-text-fill: #F2F2F2;
+                              -fx-prompt-text-fill: #6a8a80;
+                              -fx-background-radius: 10;
+                              -fx-padding: 12;">
+            <font><Font size="18.0"/></font>
+        </PasswordField>
+
+        <!-- Bouton Se connecter -->
+        <Button fx:id="btnSeConnecter"
+                prefHeight="50" maxWidth="370"
+                onAction="#onLogin"
+                style="-fx-background-color: #D99177;
+                       -fx-text-fill: #262626;
+                       -fx-font-weight: bold;
+                       -fx-background-radius: 10;
+                       -fx-cursor: hand;"
+                text="Se connecter">
+            <font><Font size="16.0"/></font>
+        </Button>
+
+        <!-- OU -->
+        <Text fill="#f8f5f5" text="OU">
+            <font><Font size="13.0"/></font>
+        </Text>
+
+        <!-- Bouton Créer un compte -->
+        <Button fx:id="btnCreerCompte"
+                prefHeight="50" maxWidth="370"
+                onAction="#onRegister"
+                style="-fx-background-color: transparent;
+                       -fx-text-fill: #D99177;
+                       -fx-border-color: #D99177;
+                       -fx-border-radius: 10;
+                       -fx-background-radius: 10;
+                       -fx-cursor: hand;"
+                text="Créer un compte">
+            <font><Font size="16.0"/></font>
+        </Button>
+
+        <!-- Label statut -->
+        <Label fx:id="statusLabel" text=""
+               maxWidth="370"
+               style="-fx-text-fill: red; -fx-font-size: 13px;"/>
+
+    </VBox>
+</StackPane>
+<!--        ```-->
+
+<!--        ### Ce qui change :-->
+<!--        ```-->
+<!--        AnchorPane interne avec positions fixes-->
+<!--        StackPane racine + VBox centrée automatiquement-->
+
+<!--         Scene Builder = Exécution maintenant identiques-->
+<!--        Carte toujours centrée peu importe la taille-->
