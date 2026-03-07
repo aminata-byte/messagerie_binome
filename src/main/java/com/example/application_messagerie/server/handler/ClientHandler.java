@@ -11,6 +11,7 @@ import com.example.application_messagerie.server.repository.UserRepository;
 
 import java.io.*;
 import java.net.Socket;
+import java.time.ZoneId;
 import java.util.List;
 
 public class ClientHandler implements Runnable {
@@ -121,8 +122,23 @@ public class ClientHandler implements Runnable {
                 for (User u : allUsers) {
                     if (!u.getUsername().equals(username)) {
                         boolean isOnline = ServerMain.connectedClients.containsKey(u.getUsername());
+                        Message lastMsg = messageService.getLastMessage(username, u.getUsername());
+                        long unread = messageService.countUnread(username, u.getUsername());
+                        String lastContent = "";
+                        long lastTime = 0;
+                        if (lastMsg != null) {
+                            lastContent = lastMsg.getContenu().replace("|", " ").replace(",", " ");
+                            // ✅ Correction : LocalDateTime → epoch milli
+                            lastTime = lastMsg.getDateEnvoi()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toInstant()
+                                    .toEpochMilli();
+                        }
                         userList.append(u.getUsername())
                                 .append(":").append(isOnline ? "ONLINE" : "OFFLINE")
+                                .append(":").append(lastTime)
+                                .append(":").append(unread)
+                                .append(":").append(lastContent)
                                 .append(",");
                     }
                 }

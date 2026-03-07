@@ -108,4 +108,41 @@ public class MessageRepository {
             em.close();
         }
     }
+
+    // Dernier message avec un utilisateur
+    public Message findLastMessage(String user1, String user2) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            List<Message> results = em.createQuery(
+                            "SELECT m FROM Message m " +
+                                    "WHERE (m.sender.username = :user1 AND m.receiver.username = :user2) " +
+                                    "OR (m.sender.username = :user2 AND m.receiver.username = :user1) " +
+                                    "ORDER BY m.dateEnvoi DESC", Message.class)
+                    .setParameter("user1", user1)
+                    .setParameter("user2", user2)
+                    .setMaxResults(1)
+                    .getResultList();
+            return results.isEmpty() ? null : results.get(0);
+        } finally {
+            em.close();
+        }
+    }
+
+    // Nombre de messages non lus
+    public long countUnread(String receiver, String sender) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT COUNT(m) FROM Message m " +
+                                    "WHERE m.receiver.username = :receiver " +
+                                    "AND m.sender.username = :sender " +
+                                    "AND m.statut != :statut", Long.class)
+                    .setParameter("receiver", receiver)
+                    .setParameter("sender", sender)
+                    .setParameter("statut", Message.Statut.LU)
+                    .getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
 }

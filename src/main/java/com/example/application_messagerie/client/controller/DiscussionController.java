@@ -15,7 +15,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DiscussionController {
@@ -42,7 +44,7 @@ public class DiscussionController {
     private final Map<Long, Label> pendingLabels = new HashMap<>();
     private long tempIdCounter = -1;
 
-    private static final String AVATAR_COLOR = "#2C5F8A";
+    private static final String AVATAR_COLOR  = "#2C5F8A";
     private static final String CELL_SELECTED = "-fx-background-color: #1A3D63; -fx-background-radius: 8; -fx-cursor: hand;";
     private static final String CELL_HOVER    = "-fx-background-color: #132D4A; -fx-background-radius: 8; -fx-cursor: hand;";
     private static final String CELL_NORMAL   = "-fx-background-color: transparent; -fx-cursor: hand;";
@@ -58,7 +60,6 @@ public class DiscussionController {
 
         connection.getUsers();
 
-        // Supprimer la surbrillance bleue par défaut de la ListView
         userListView.setStyle(
                 "-fx-background-color: transparent; -fx-border-color: transparent;" +
                         "-fx-selection-bar: transparent; -fx-selection-bar-non-focused: transparent;"
@@ -113,22 +114,29 @@ public class DiscussionController {
                     setOnMouseEntered(null);
                     setOnMouseExited(null);
                 } else {
-                    String displayName = user.contains(":") ? user.split(":")[0] : user;
-                    boolean isOnline = user.contains(":ONLINE");
+                    // Format: "username:ONLINE/OFFLINE:lastTime:unread:lastMsg"
+                    String[] parts = user.split(":", 5);
+                    String displayName = parts[0];
+                    boolean isOnline = parts.length >= 2 && parts[1].equals("ONLINE");
+                    long unread = parts.length >= 4 ? parseLong(parts[3]) : 0;
+                    String lastMsg = parts.length >= 5 ? parts[4] : "";
+                    if (lastMsg.length() > 25) lastMsg = lastMsg.substring(0, 25) + "...";
 
+                    // Avatar
                     StackPane avatar = new StackPane();
-                    avatar.setPrefSize(36, 36);
-                    avatar.setMinSize(36, 36);
-                    avatar.setMaxSize(36, 36);
+                    avatar.setPrefSize(40, 40);
+                    avatar.setMinSize(40, 40);
+                    avatar.setMaxSize(40, 40);
                     avatar.setStyle("-fx-background-color: " + AVATAR_COLOR + "; -fx-background-radius: 50;");
                     Label initiale = new Label(String.valueOf(displayName.charAt(0)).toUpperCase());
-                    initiale.setStyle("-fx-text-fill: #F6FAFD; -fx-font-size: 14px; -fx-font-weight: bold;");
+                    initiale.setStyle("-fx-text-fill: #F6FAFD; -fx-font-size: 15px; -fx-font-weight: bold;");
                     avatar.getChildren().add(initiale);
 
+                    // Container avatar + point vert
                     StackPane avatarContainer = new StackPane();
-                    avatarContainer.setPrefSize(38, 38);
-                    avatarContainer.setMinSize(38, 38);
-                    avatarContainer.setMaxSize(38, 38);
+                    avatarContainer.setPrefSize(42, 42);
+                    avatarContainer.setMinSize(42, 42);
+                    avatarContainer.setMaxSize(42, 42);
                     if (isOnline) {
                         Circle dot = new Circle(5);
                         dot.setFill(Color.web("#4CAF50"));
@@ -139,31 +147,53 @@ public class DiscussionController {
                         avatarContainer.getChildren().add(avatar);
                     }
 
+                    // Nom + dernier message
                     Label nomLabel = new Label(displayName);
-                    nomLabel.setStyle("-fx-text-fill: " + (isOnline ? "#F6FAFD" : "#B3CFE5") + "; -fx-font-size: 13px;");
+                    nomLabel.setStyle("-fx-text-fill: " + (isOnline ? "#F6FAFD" : "#B3CFE5") +
+                            "; -fx-font-size: 13px; -fx-font-weight: bold;");
 
-                    HBox cellContent = new HBox(10, avatarContainer, nomLabel);
+                    Label lastMsgLabel = new Label(lastMsg);
+                    lastMsgLabel.setStyle("-fx-text-fill: #8AA8C4; -fx-font-size: 11px;");
+                    lastMsgLabel.setMaxWidth(130);
+
+                    VBox nameBox = new VBox(2, nomLabel, lastMsgLabel);
+                    nameBox.setAlignment(Pos.CENTER_LEFT);
+                    HBox.setHgrow(nameBox, Priority.ALWAYS);
+
+                    // Badge non lus
+                    HBox rightBox = new HBox();
+                    rightBox.setAlignment(Pos.CENTER_RIGHT);
+                    rightBox.setMinWidth(30);
+                    if (unread > 0) {
+                        Label badge = new Label(String.valueOf(unread));
+                        badge.setStyle(
+                                "-fx-background-color: #4CAF50;" +
+                                        "-fx-text-fill: #F6FAFD;" +
+                                        "-fx-font-size: 10px;" +
+                                        "-fx-font-weight: bold;" +
+                                        "-fx-background-radius: 10;" +
+                                        "-fx-padding: 2 6;"
+                        );
+                        rightBox.getChildren().add(badge);
+                    }
+
+                    HBox cellContent = new HBox(10, avatarContainer, nameBox, rightBox);
                     cellContent.setAlignment(Pos.CENTER_LEFT);
                     cellContent.setStyle("-fx-padding: 8 10;");
                     setGraphic(cellContent);
                     setText(null);
 
-                    // Style selon sélection
+                    // Style sélection
                     boolean selected = displayName.equals(selectedUser);
                     setStyle(selected ? CELL_SELECTED : CELL_NORMAL);
 
                     // Effet hover
                     setOnMouseEntered(e -> {
-                        if (!displayName.equals(selectedUser)) {
-                            setStyle(CELL_HOVER);
-                        }
+                        if (!displayName.equals(selectedUser)) setStyle(CELL_HOVER);
                     });
                     setOnMouseExited(e -> {
-                        if (!displayName.equals(selectedUser)) {
-                            setStyle(CELL_NORMAL);
-                        } else {
-                            setStyle(CELL_SELECTED);
-                        }
+                        if (!displayName.equals(selectedUser)) setStyle(CELL_NORMAL);
+                        else setStyle(CELL_SELECTED);
                     });
                 }
             }
@@ -172,8 +202,9 @@ public class DiscussionController {
         userListView.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldVal, newVal) -> {
                     if (newVal != null) {
-                        selectedUser = newVal.contains(":") ? newVal.split(":")[0] : newVal;
-                        boolean isOnline = newVal.contains(":ONLINE");
+                        String[] parts = newVal.split(":", 5);
+                        selectedUser = parts[0];
+                        boolean isOnline = parts.length >= 2 && parts[1].equals("ONLINE");
 
                         chatTargetLabel.setText(selectedUser);
                         statusTargetLabel.setText(isOnline ? "en ligne" : "hors ligne");
@@ -192,7 +223,6 @@ public class DiscussionController {
                         inputBox.setVisible(true);
                         inputBox.setManaged(true);
 
-                        // Rafraîchir la liste pour mettre à jour les styles
                         userListView.refresh();
 
                         Platform.runLater(() -> {
@@ -213,22 +243,38 @@ public class DiscussionController {
         );
     }
 
+    private long parseLong(String s) {
+        try { return Long.parseLong(s); } catch (Exception e) { return 0; }
+    }
+
     private void handlePacket(Packet packet) {
         switch (packet.getType()) {
 
             case USER_LIST -> {
-                userListView.getItems().clear();
                 String content = packet.getContent();
-                if (content != null && !content.isEmpty()) {
-                    String[] users = content.split(",");
-                    for (String u : users) {
-                        if (!u.isEmpty()) {
-                            String username = u.contains(":") ? u.split(":")[0] : u;
-                            if (!username.isEmpty() && !username.equals(connection.getUsername())) {
-                                userListView.getItems().add(u);
-                            }
-                        }
+                if (content == null || content.isEmpty()) return;
+
+                // Parser toutes les entrées
+                List<String[]> parsed = new ArrayList<>();
+                for (String u : content.split(",")) {
+                    if (u.isEmpty()) continue;
+                    String[] parts = u.split(":", 5);
+                    String uname = parts[0];
+                    if (!uname.isEmpty() && !uname.equals(connection.getUsername())) {
+                        parsed.add(parts);
                     }
+                }
+
+                // Trier par lastTime décroissant (plus récent en haut)
+                parsed.sort((a, b) -> {
+                    long timeA = a.length >= 3 ? parseLong(a[2]) : 0;
+                    long timeB = b.length >= 3 ? parseLong(b[2]) : 0;
+                    return Long.compare(timeB, timeA);
+                });
+
+                userListView.getItems().clear();
+                for (String[] parts : parsed) {
+                    userListView.getItems().add(String.join(":", parts));
                 }
             }
 
@@ -249,6 +295,8 @@ public class DiscussionController {
                         connection.markRead(selectedUser);
                     }
                 }
+                // Rafraîchir la liste pour mettre à jour badge et tri
+                connection.getUsers();
             }
 
             case HISTORY_RESPONSE -> {
@@ -307,6 +355,8 @@ public class DiscussionController {
                         }
                     } catch (Exception ignored) {}
                 }
+                // Rafraîchir la liste après lecture
+                connection.getUsers();
             }
 
             case USER_STATUS_CHANGE -> {

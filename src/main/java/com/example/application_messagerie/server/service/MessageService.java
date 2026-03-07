@@ -58,4 +58,14 @@ public class MessageService {
     public List<Long> markConversationAsRead(String receiverUsername, String senderUsername) {
         return messageRepository.markConversationAsRead(receiverUsername, senderUsername);
     }
+
+    // Dernier message avec un utilisateur
+    public Message getLastMessage(String user1, String user2) {
+        return messageRepository.findLastMessage(user1, user2);
+    }
+
+    // Nombre de messages non lus
+    public long countUnread(String receiver, String sender) {
+        return messageRepository.countUnread(receiver, sender);
+    }
 }
