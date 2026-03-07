@@ -117,6 +117,10 @@ public class ClientHandler implements Runnable {
             }
 
             case GET_USERS -> {
+                if (username == null) {
+                    sendMessage(new Packet(PacketType.ERROR, "Non authentifié.").toJson());
+                    return;
+                }
                 List<User> allUsers = userRepository.findAll();
                 StringBuilder userList = new StringBuilder();
                 for (User u : allUsers) {
@@ -128,7 +132,6 @@ public class ClientHandler implements Runnable {
                         long lastTime = 0;
                         if (lastMsg != null) {
                             lastContent = lastMsg.getContenu().replace("|", " ").replace(",", " ");
-                            // ✅ Correction : LocalDateTime → epoch milli
                             lastTime = lastMsg.getDateEnvoi()
                                     .atZone(ZoneId.systemDefault())
                                     .toInstant()
@@ -146,6 +149,10 @@ public class ClientHandler implements Runnable {
             }
 
             case GET_HISTORY -> {
+                if (username == null) {
+                    sendMessage(new Packet(PacketType.ERROR, "Non authentifié.").toJson());
+                    return;
+                }
                 String otherUser = packet.getContent();
                 List<Message> history = messageService.getConversation(username, otherUser);
                 StringBuilder sb = new StringBuilder();

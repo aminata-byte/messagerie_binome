@@ -254,7 +254,6 @@ public class DiscussionController {
                 String content = packet.getContent();
                 if (content == null || content.isEmpty()) return;
 
-                // Parser toutes les entrées
                 List<String[]> parsed = new ArrayList<>();
                 for (String u : content.split(",")) {
                     if (u.isEmpty()) continue;
@@ -363,9 +362,19 @@ public class DiscussionController {
                 connection.getUsers();
             }
 
+            // ✅ RG10 - Perte de connexion : affiche erreur et redirige vers Login après 2s
             case ERROR -> {
                 chatTargetLabel.setText("Connexion perdue !");
                 chatTargetLabel.setStyle("-fx-text-fill: #F22727;");
+                new Thread(() -> {
+                    try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
+                    Platform.runLater(() -> {
+                        Stage stage = (Stage) btnDeconnexion.getScene().getWindow();
+                        NavigationUtil.navigateTo(stage,
+                                "/com/example/application_messagerie/Login.fxml",
+                                "Messagerie Interne");
+                    });
+                }).start();
             }
         }
     }
