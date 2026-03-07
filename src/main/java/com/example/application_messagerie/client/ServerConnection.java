@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 public class ServerConnection {
 
-    private static final String HOST = "localhost";
+    private static final String HOST = "10.1.6.23";
     private static final int PORT = 5555;
 
     private static ServerConnection instance;

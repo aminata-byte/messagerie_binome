@@ -42,9 +42,10 @@ public class DiscussionController {
     private final Map<Long, Label> pendingLabels = new HashMap<>();
     private long tempIdCounter = -1;
 
-    private final String[] AVATAR_COLORS = {
-            "#1A3D63", "#4A7FA7", "#0A1931", "#2C5F8A", "#3D7AB5"
-    };
+    private static final String AVATAR_COLOR = "#2C5F8A";
+    private static final String CELL_SELECTED = "-fx-background-color: #1A3D63; -fx-background-radius: 8; -fx-cursor: hand;";
+    private static final String CELL_HOVER    = "-fx-background-color: #132D4A; -fx-background-radius: 8; -fx-cursor: hand;";
+    private static final String CELL_NORMAL   = "-fx-background-color: transparent; -fx-cursor: hand;";
 
     @FXML
     public void initialize() {
@@ -56,6 +57,12 @@ public class DiscussionController {
         );
 
         connection.getUsers();
+
+        // Supprimer la surbrillance bleue par défaut de la ListView
+        userListView.setStyle(
+                "-fx-background-color: transparent; -fx-border-color: transparent;" +
+                        "-fx-selection-bar: transparent; -fx-selection-bar-non-focused: transparent;"
+        );
 
         Platform.runLater(() -> {
             double maxScroll = scrollPane.getScene().getHeight() - 65 - 65;
@@ -102,7 +109,9 @@ public class DiscussionController {
                 if (empty || user == null) {
                     setGraphic(null);
                     setText(null);
-                    setStyle("-fx-background-color: transparent;");
+                    setStyle(CELL_NORMAL);
+                    setOnMouseEntered(null);
+                    setOnMouseExited(null);
                 } else {
                     String displayName = user.contains(":") ? user.split(":")[0] : user;
                     boolean isOnline = user.contains(":ONLINE");
@@ -111,13 +120,11 @@ public class DiscussionController {
                     avatar.setPrefSize(36, 36);
                     avatar.setMinSize(36, 36);
                     avatar.setMaxSize(36, 36);
-                    String color = AVATAR_COLORS[Math.abs(displayName.hashCode()) % AVATAR_COLORS.length];
-                    avatar.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 50;");
+                    avatar.setStyle("-fx-background-color: " + AVATAR_COLOR + "; -fx-background-radius: 50;");
                     Label initiale = new Label(String.valueOf(displayName.charAt(0)).toUpperCase());
                     initiale.setStyle("-fx-text-fill: #F6FAFD; -fx-font-size: 14px; -fx-font-weight: bold;");
                     avatar.getChildren().add(initiale);
 
-                    // Point vert si en ligne
                     StackPane avatarContainer = new StackPane();
                     avatarContainer.setPrefSize(38, 38);
                     avatarContainer.setMinSize(38, 38);
@@ -140,7 +147,24 @@ public class DiscussionController {
                     cellContent.setStyle("-fx-padding: 8 10;");
                     setGraphic(cellContent);
                     setText(null);
-                    setStyle("-fx-background-color: transparent;");
+
+                    // Style selon sélection
+                    boolean selected = displayName.equals(selectedUser);
+                    setStyle(selected ? CELL_SELECTED : CELL_NORMAL);
+
+                    // Effet hover
+                    setOnMouseEntered(e -> {
+                        if (!displayName.equals(selectedUser)) {
+                            setStyle(CELL_HOVER);
+                        }
+                    });
+                    setOnMouseExited(e -> {
+                        if (!displayName.equals(selectedUser)) {
+                            setStyle(CELL_NORMAL);
+                        } else {
+                            setStyle(CELL_SELECTED);
+                        }
+                    });
                 }
             }
         });
@@ -148,15 +172,13 @@ public class DiscussionController {
         userListView.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldVal, newVal) -> {
                     if (newVal != null) {
-                        // Extraire juste le nom sans ":ONLINE"/":OFFLINE"
                         selectedUser = newVal.contains(":") ? newVal.split(":")[0] : newVal;
                         boolean isOnline = newVal.contains(":ONLINE");
 
                         chatTargetLabel.setText(selectedUser);
                         statusTargetLabel.setText(isOnline ? "en ligne" : "hors ligne");
 
-                        String color = AVATAR_COLORS[Math.abs(selectedUser.hashCode()) % AVATAR_COLORS.length];
-                        headerAvatar.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 50;");
+                        headerAvatar.setStyle("-fx-background-color: " + AVATAR_COLOR + "; -fx-background-radius: 19;");
                         headerAvatarLabel.setText(String.valueOf(selectedUser.charAt(0)).toUpperCase());
 
                         messagesBox.getChildren().clear();
@@ -169,6 +191,9 @@ public class DiscussionController {
                         scrollPane.setManaged(true);
                         inputBox.setVisible(true);
                         inputBox.setManaged(true);
+
+                        // Rafraîchir la liste pour mettre à jour les styles
+                        userListView.refresh();
 
                         Platform.runLater(() -> {
                             if (scrollPane.getScene() != null) {
@@ -323,8 +348,7 @@ public class DiscussionController {
         avatar.setPrefSize(32, 32);
         avatar.setMinSize(32, 32);
         avatar.setMaxSize(32, 32);
-        String color = AVATAR_COLORS[Math.abs(sender.hashCode()) % AVATAR_COLORS.length];
-        avatar.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 50;");
+        avatar.setStyle("-fx-background-color: " + AVATAR_COLOR + "; -fx-background-radius: 50;");
         Label initiale = new Label(String.valueOf(sender.charAt(0)).toUpperCase());
         initiale.setStyle("-fx-text-fill: #F6FAFD; -fx-font-size: 11px; -fx-font-weight: bold;");
         avatar.getChildren().add(initiale);

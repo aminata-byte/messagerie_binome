@@ -38,12 +38,16 @@
               spacing="12"
               style="-fx-background-color: #0D2240; -fx-padding: 0 20;
                      -fx-border-color: #1A3D63; -fx-border-width: 0 0 1 0;">
-            <StackPane fx:id="headerAvatar" prefHeight="40" prefWidth="40"
-                       minHeight="40" minWidth="40"
-                       style="-fx-background-color: #1A3D63; -fx-background-radius: 50;">
+
+            <StackPane fx:id="headerAvatar"
+                       prefWidth="38" prefHeight="38"
+                       minWidth="38" minHeight="38"
+                       maxWidth="38" maxHeight="38"
+                       style="-fx-background-color: #2C5F8A; -fx-background-radius: 19;">
                 <Label fx:id="headerAvatarLabel" text=""
                        style="-fx-text-fill: #F6FAFD; -fx-font-size: 14px; -fx-font-weight: bold;" />
             </StackPane>
+
             <VBox spacing="3">
                 <Label fx:id="chatTargetLabel" text="Sélectionner un utilisateur"
                        style="-fx-text-fill: #F6FAFD; -fx-font-size: 15px; -fx-font-weight: bold;" />
