@@ -1,7 +1,6 @@
 package com.example.application_messagerie.server.repository;
 
 import com.example.application_messagerie.entity.Message;
-import com.example.application_messagerie.entity.User;
 import com.example.application_messagerie.utils.JPAUtil;
 
 import javax.persistence.EntityManager;
@@ -71,6 +70,39 @@ public class MessageRepository {
             em.getTransaction().commit();
         } catch (Exception e) {
             em.getTransaction().rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    // Marquer tous les messages non lus comme LU et retourner leurs IDs
+    public List<Long> markConversationAsRead(String receiverUsername, String senderUsername) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            List<Long> ids = em.createQuery(
+                            "SELECT m.id FROM Message m " +
+                                    "WHERE m.receiver.username = :receiver " +
+                                    "AND m.sender.username = :sender " +
+                                    "AND m.statut != :statut", Long.class)
+                    .setParameter("receiver", receiverUsername)
+                    .setParameter("sender", senderUsername)
+                    .setParameter("statut", Message.Statut.LU)
+                    .getResultList();
+
+            if (!ids.isEmpty()) {
+                em.getTransaction().begin();
+                em.createQuery(
+                                "UPDATE Message m SET m.statut = :statut " +
+                                        "WHERE m.id IN :ids")
+                        .setParameter("statut", Message.Statut.LU)
+                        .setParameter("ids", ids)
+                        .executeUpdate();
+                em.getTransaction().commit();
+            }
+            return ids;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
             throw e;
         } finally {
             em.close();

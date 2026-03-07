@@ -14,7 +14,7 @@
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="com.example.application_messagerie.client.controller.InscriptionController"
         alignment="CENTER"
-        style="-fx-background-color: #0d0d1a;">
+        style="-fx-background-color: #0A1931;">
 
     <children>
         <VBox
@@ -22,10 +22,10 @@
                 prefWidth="420.0"
                 spacing="15.0"
                 alignment="CENTER"
-                style="-fx-background-color: #1a1a2e; -fx-background-radius: 20; -fx-padding: 40;"
+                style="-fx-background-color: #1A3D63; -fx-background-radius: 20; -fx-padding: 40;"
                 StackPane.alignment="CENTER">
             <children>
-                <Text fill="#fcf9f9" strokeType="OUTSIDE" strokeWidth="0.0" text="Créer un compte">
+                <Text fill="#F6FAFD" strokeType="OUTSIDE" strokeWidth="0.0" text="Créer un compte">
                     <font>
                         <Font size="24.0" />
                     </font>
@@ -36,7 +36,7 @@
                         maxWidth="370.0"
                         prefHeight="55.0"
                         promptText="Nom d'utilisateur"
-                        style="-fx-background-color: #224037; -fx-text-fill: #F2F2F2; -fx-background-radius: 10; -fx-padding: 12;">
+                        style="-fx-background-color: #4A7FA7; -fx-text-fill: #F6FAFD; -fx-background-radius: 10; -fx-padding: 12;">
                     <font>
                         <Font size="16.0" />
                     </font>
@@ -47,7 +47,7 @@
                         maxWidth="370.0"
                         prefHeight="55.0"
                         promptText="Mot de passe"
-                        style="-fx-background-color: #224037; -fx-text-fill: #F2F2F2; -fx-background-radius: 10; -fx-padding: 12;">
+                        style="-fx-background-color: #4A7FA7; -fx-text-fill: #F6FAFD; -fx-background-radius: 10; -fx-padding: 12;">
                     <font>
                         <Font size="16.0" />
                     </font>
@@ -58,7 +58,7 @@
                         maxWidth="370.0"
                         prefHeight="55.0"
                         promptText="Confirmer mot de passe"
-                        style="-fx-background-color: #224037; -fx-text-fill: #F2F2F2; -fx-background-radius: 10; -fx-padding: 12;">
+                        style="-fx-background-color: #4A7FA7; -fx-text-fill: #F6FAFD; -fx-background-radius: 10; -fx-padding: 12;">
                     <font>
                         <Font size="16.0" />
                     </font>
@@ -70,7 +70,7 @@
                         mnemonicParsing="false"
                         prefHeight="50.0"
                         onAction="#onRegister"
-                        style="-fx-background-color: #D99177; -fx-text-fill: #262626; -fx-font-weight: bold; -fx-background-radius: 10;"
+                        style="-fx-background-color: #4A7FA7; -fx-text-fill: #0A1931; -fx-font-weight: bold; -fx-background-radius: 10;"
                         text="S'inscrire" />
 
                 <Button
@@ -79,7 +79,7 @@
                         mnemonicParsing="false"
                         prefHeight="45.0"
                         onAction="#onBackToLogin"
-                        style="-fx-background-color: transparent; -fx-text-fill: #D99177; -fx-border-color: #D99177; -fx-border-radius: 10;"
+                        style="-fx-background-color: transparent; -fx-text-fill: #4A7FA7; -fx-border-color: #4A7FA7; -fx-border-radius: 10;"
                         text="Retour à la connexion" />
 
                 <Label fx:id="statusLabel" style="-fx-text-fill: red;" />

@@ -13,12 +13,11 @@ public class NavigationUtil {
             FXMLLoader loader = new FXMLLoader(
                     NavigationUtil.class.getResource(fxmlPath)
             );
-            stage.hide();                         // ✅ Cacher avant tout changement
-            stage.setMaximized(false);            // Reset silencieux (fenêtre cachée)
             stage.setScene(new Scene(loader.load()));
             stage.setTitle(title);
-            stage.setMaximized(true);             // Maximiser avant d'afficher
-            stage.show();                         // ✅ Afficher déjà maximisé
+            stage.setMaximized(false);
+            stage.setMaximized(true);
+            stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }

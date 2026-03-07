@@ -114,6 +114,12 @@ public class ServerConnection {
         send(packet);
     }
 
+    // MARK READ
+    public void markRead(String otherUser) {
+        Packet packet = new Packet(PacketType.MARK_READ, username, otherUser, otherUser);
+        send(packet);
+    }
+
     // LOGOUT
     public void logout() {
         Packet packet = new Packet(PacketType.LOGOUT);

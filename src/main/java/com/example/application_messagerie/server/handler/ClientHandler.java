@@ -1,11 +1,13 @@
 package com.example.application_messagerie.server.handler;
 
 import com.example.application_messagerie.entity.Message;
+import com.example.application_messagerie.entity.User;
 import com.example.application_messagerie.protocol.Packet;
 import com.example.application_messagerie.protocol.PacketType;
 import com.example.application_messagerie.server.ServerMain;
 import com.example.application_messagerie.server.service.AuthService;
 import com.example.application_messagerie.server.service.MessageService;
+import com.example.application_messagerie.server.repository.UserRepository;
 
 import java.io.*;
 import java.net.Socket;
@@ -20,6 +22,7 @@ public class ClientHandler implements Runnable {
 
     private final AuthService authService = new AuthService();
     private final MessageService messageService = new MessageService();
+    private final UserRepository userRepository = new UserRepository();
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -48,7 +51,6 @@ public class ClientHandler implements Runnable {
         switch (packet.getType()) {
 
             case LOGIN -> {
-                // content = "username:password"
                 String[] parts = packet.getContent().split(":", 2);
                 String user = parts[0];
                 String pass = parts[1];
@@ -59,23 +61,12 @@ public class ClientHandler implements Runnable {
                 if (result.startsWith("SUCCESS")) {
                     this.username = user;
                     ServerMain.connectedClients.put(username, this);
-
-                    // Envoyer SUCCESS
-                    Packet response = new Packet(PacketType.SUCCESS, username);
-                    sendMessage(response.toJson());
-
-                    // RG6 : livrer messages en attente
+                    sendMessage(new Packet(PacketType.SUCCESS, username).toJson());
                     deliverPendingMessages();
-
-                    // Notifier tous les clients
                     notifyUserStatusChange(username, "ONLINE");
-
-                    // RG12 : journaliser
                     System.out.println("[LOG] Connexion : " + username);
-
                 } else {
-                    Packet response = new Packet(PacketType.ERROR, result.split(":", 2)[1]);
-                    sendMessage(response.toJson());
+                    sendMessage(new Packet(PacketType.ERROR, result.split(":", 2)[1]).toJson());
                 }
             }
 
@@ -83,21 +74,16 @@ public class ClientHandler implements Runnable {
                 String[] parts = packet.getContent().split(":", 2);
                 String user = parts[0];
                 String pass = parts[1];
-
                 String result = authService.register(user, pass);
-
                 if (result.startsWith("SUCCESS")) {
-                    Packet response = new Packet(PacketType.SUCCESS, "Inscription réussie.");
-                    sendMessage(response.toJson());
+                    sendMessage(new Packet(PacketType.SUCCESS, "Inscription réussie.").toJson());
                     System.out.println("[LOG] Inscription : " + user);
                 } else {
-                    Packet response = new Packet(PacketType.ERROR, result.split(":", 2)[1]);
-                    sendMessage(response.toJson());
+                    sendMessage(new Packet(PacketType.ERROR, result.split(":", 2)[1]).toJson());
                 }
             }
 
             case SEND_MESSAGE -> {
-                // RG2 : doit être authentifié
                 if (username == null) {
                     sendMessage(new Packet(PacketType.ERROR, "Non authentifié.").toJson());
                     return;
@@ -105,17 +91,24 @@ public class ClientHandler implements Runnable {
 
                 String receiver = packet.getReceiver();
                 String contenu = packet.getContent();
-
-                // RG5 + RG7 : validation
                 String result = messageService.sendMessage(username, receiver, contenu);
 
                 if (result.startsWith("SUCCESS")) {
-                    // Si destinataire connecté → livrer en temps réel
+                    Long msgId = Long.parseLong(result.split(":")[1]);
+
                     if (ServerMain.connectedClients.containsKey(receiver)) {
+                        messageService.markAsReceived(msgId);
                         Packet msg = new Packet(PacketType.RECEIVE_MESSAGE, username, receiver, contenu);
+                        msg.setExtra(msgId + ":RECU");
                         ServerMain.sendToClient(receiver, msg.toJson());
+                        Packet statusUpdate = new Packet(PacketType.MESSAGES_READ, null, null, msgId + ":RECU");
+                        sendMessage(statusUpdate.toJson());
+                        System.out.println("[DEBUG] MESSAGES_READ envoyé à " + username + " content=" + msgId + ":RECU");
+                    } else {
+                        Packet statusUpdate = new Packet(PacketType.MESSAGES_READ, null, null, msgId + ":ENVOYE");
+                        sendMessage(statusUpdate.toJson());
+                        System.out.println("[DEBUG] MESSAGES_READ envoyé à " + username + " content=" + msgId + ":ENVOYE");
                     }
-                    sendMessage(new Packet(PacketType.SUCCESS, "Message envoyé.").toJson());
                     System.out.println("[LOG] Message : " + username + " → " + receiver);
                 } else {
                     sendMessage(new Packet(PacketType.ERROR, result.split(":", 2)[1]).toJson());
@@ -123,27 +116,44 @@ public class ClientHandler implements Runnable {
             }
 
             case GET_USERS -> {
-                // Envoyer liste de tous les utilisateurs
+                List<User> allUsers = userRepository.findAll();
                 StringBuilder userList = new StringBuilder();
-                ServerMain.connectedClients.keySet().forEach(u -> userList.append(u).append(","));
-                Packet response = new Packet(PacketType.USER_LIST, userList.toString());
-                sendMessage(response.toJson());
+                for (User u : allUsers) {
+                    if (!u.getUsername().equals(username)) {
+                        boolean isOnline = ServerMain.connectedClients.containsKey(u.getUsername());
+                        userList.append(u.getUsername())
+                                .append(":").append(isOnline ? "ONLINE" : "OFFLINE")
+                                .append(",");
+                    }
+                }
+                sendMessage(new Packet(PacketType.USER_LIST, userList.toString()).toJson());
             }
 
             case GET_HISTORY -> {
-                // content = username de l'autre utilisateur
                 String otherUser = packet.getContent();
                 List<Message> history = messageService.getConversation(username, otherUser);
-
                 StringBuilder sb = new StringBuilder();
                 for (Message m : history) {
                     sb.append(m.getSender().getUsername())
-                            .append(":")
-                            .append(m.getContenu())
+                            .append(":").append(m.getContenu())
+                            .append(":").append(m.getStatut().name())
+                            .append(":").append(m.getId())
                             .append("|");
                 }
-                Packet response = new Packet(PacketType.HISTORY_RESPONSE, sb.toString());
-                sendMessage(response.toJson());
+                sendMessage(new Packet(PacketType.HISTORY_RESPONSE, sb.toString()).toJson());
+            }
+
+            case MARK_READ -> {
+                String otherUser = packet.getContent();
+                List<Long> ids = messageService.markConversationAsRead(username, otherUser);
+                System.out.println("[DEBUG] MARK_READ de " + username + " pour " + otherUser + " ids=" + ids);
+                if (!ids.isEmpty() && ServerMain.connectedClients.containsKey(otherUser)) {
+                    String idList = ids.stream()
+                            .map(String::valueOf)
+                            .reduce("", (a, b) -> a.isEmpty() ? b : a + "," + b);
+                    Packet notify = new Packet(PacketType.MESSAGES_READ, null, null, idList + ":LU");
+                    ServerMain.sendToClient(otherUser, notify.toJson());
+                }
             }
 
             case LOGOUT -> {
@@ -152,48 +162,33 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // RG6 : livrer messages en attente
     private void deliverPendingMessages() throws Exception {
         List<Message> pending = messageService.getUndelivered(username);
         for (Message m : pending) {
-            Packet msg = new Packet(
-                    PacketType.RECEIVE_MESSAGE,
-                    m.getSender().getUsername(),
-                    username,
-                    m.getContenu()
-            );
+            Packet msg = new Packet(PacketType.RECEIVE_MESSAGE,
+                    m.getSender().getUsername(), username, m.getContenu());
+            msg.setExtra(m.getId() + ":RECU");
             sendMessage(msg.toJson());
             messageService.markAsReceived(m.getId());
         }
     }
 
-    // Notifier changement de statut
     private void notifyUserStatusChange(String user, String status) throws Exception {
         Packet packet = new Packet(PacketType.USER_STATUS_CHANGE, user, status);
         ServerMain.broadcast(packet.toJson());
     }
 
-    // Déconnexion (RG4 + RG12)
     private void disconnect() {
         if (username != null) {
             authService.logout(username);
             ServerMain.connectedClients.remove(username);
-            try {
-                notifyUserStatusChange(username, "OFFLINE");
-            } catch (Exception e) {
-                // ignore
-            }
+            try { notifyUserStatusChange(username, "OFFLINE"); } catch (Exception e) {}
             System.out.println("[LOG] Déconnexion : " + username);
             username = null;
         }
-        try {
-            socket.close();
-        } catch (IOException e) {
-            // ignore
-        }
+        try { socket.close(); } catch (IOException e) {}
     }
 
-    // Envoyer un message JSON au client
     public void sendMessage(String json) {
         out.println(json);
     }

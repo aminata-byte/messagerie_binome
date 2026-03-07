@@ -7,7 +7,7 @@
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 
-<StackPane style="-fx-background-color: #0d0d1a;"
+<StackPane style="-fx-background-color: #0A1931;"
            xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.example.application_messagerie.client.controller.LoginController">
@@ -17,14 +17,14 @@
           spacing="15"
           prefWidth="420"
           maxWidth="420"
-          style="-fx-background-color: #1a1a2e;
+          style="-fx-background-color:  #1A3D63;
                  -fx-background-radius: 20;
                  -fx-padding: 40;">
 
         <!-- Icône -->
         <StackPane prefHeight="64" prefWidth="64"
                    maxWidth="64"
-                   style="-fx-background-color: #D99177;
+                   style="-fx-background-color: #F6FAFD;
                           -fx-background-radius: 15;">
             <ImageView fitHeight="50" fitWidth="50"
                        pickOnBounds="true" preserveRatio="true">
@@ -43,9 +43,9 @@
         <TextField fx:id="usernameField"
                    prefHeight="55" maxWidth="370"
                    promptText="Nom d'utilisateur"
-                   style="-fx-background-color: #224037;
-                          -fx-text-fill: #F2F2F2;
-                          -fx-prompt-text-fill: #6a8a80;
+                   style="-fx-background-color:  #4A7FA7;
+                          -fx-text-fill:  #F6FAFD;
+                          -fx-prompt-text-fill: #B3CFE5;
                           -fx-background-radius: 10;
                           -fx-padding: 12;">
             <font><Font size="18.0"/></font>
@@ -55,9 +55,9 @@
         <PasswordField fx:id="passwordField"
                        prefHeight="55" maxWidth="370"
                        promptText="Mot de passe"
-                       style="-fx-background-color: #224037;
-                              -fx-text-fill: #F2F2F2;
-                              -fx-prompt-text-fill: #6a8a80;
+                       style="-fx-background-color:  #4A7FA7;
+                              -fx-text-fill:  #F6FAFD;
+                              -fx-prompt-text-fill: #B3CFE5;
                               -fx-background-radius: 10;
                               -fx-padding: 12;">
             <font><Font size="18.0"/></font>
@@ -67,8 +67,8 @@
         <Button fx:id="btnSeConnecter"
                 prefHeight="50" maxWidth="370"
                 onAction="#onLogin"
-                style="-fx-background-color: #D99177;
-                       -fx-text-fill: #262626;
+                style="-fx-background-color: #F6FAFD;
+                       -fx-text-fill: #0A1931;
                        -fx-font-weight: bold;
                        -fx-background-radius: 10;
                        -fx-cursor: hand;"
@@ -77,7 +77,7 @@
         </Button>
 
         <!-- OU -->
-        <Text fill="#f8f5f5" text="OU">
+        <Text fill="#B3CFE5" text="OU">
             <font><Font size="13.0"/></font>
         </Text>
 
@@ -86,8 +86,8 @@
                 prefHeight="50" maxWidth="370"
                 onAction="#onRegister"
                 style="-fx-background-color: transparent;
-                       -fx-text-fill: #D99177;
-                       -fx-border-color: #D99177;
+                       -fx-text-fill: #4A7FA7;
+                       -fx-border-color: #4A7FA7;
                        -fx-border-radius: 10;
                        -fx-background-radius: 10;
                        -fx-cursor: hand;"

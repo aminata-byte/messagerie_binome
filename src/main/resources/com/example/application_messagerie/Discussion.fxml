@@ -1,69 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #0d0d1a;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.application_messagerie.client.controller.DiscussionController">
-    <children>
-        <HBox prefHeight="600.0" prefWidth="900.0">
-            <children>
+<HBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.application_messagerie.client.controller.DiscussionController"
+      style="-fx-background-color: #0A1931;">
 
-                <!-- VBox GAUCHE -->
-                <VBox maxWidth="250.0" minWidth="250.0" prefWidth="250.0" spacing="10.0" style="-fx-background-color: #1a1a2e;">
-                    <children>
-                        <Label style="-fx-text-fill: #fcf9f9; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 15;" text="Messagerie Interne" />
-                        <Label fx:id="currentUserLabel" style="-fx-text-fill: #6a8a80; -fx-font-size: 12px; -fx-padding: 0 15;" text="Connecté" />
-                        <ListView fx:id="userListView" style="-fx-background-color: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS" />
-                        <Button fx:id="btnDeconnexion" maxWidth="Infinity" onAction="#onDeconnexion" prefHeight="45.0" style="-fx-background-color: #2a1a1a; -fx-text-fill: #D99177; -fx-border-color: #D99177; -fx-border-width: 1 0 0 0; -fx-cursor: hand; -fx-font-size: 13px;" text="Se déconnecter" />
-                    </children>
-                </VBox>
+    <VBox minWidth="230" maxWidth="230" prefWidth="230"
+          style="-fx-background-color: #0A1931; -fx-border-color: #1A3D63; -fx-border-width: 0 1 0 0;">
+        <VBox.vgrow>ALWAYS</VBox.vgrow>
+        <Label text="Messagerie Interne"
+               style="-fx-text-fill: #F6FAFD; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 20 15 5 15;" />
+        <Label fx:id="currentUserLabel" text="Connecté" wrapText="true"
+               style="-fx-text-fill: #B3CFE5; -fx-font-size: 11px; -fx-padding: 0 15 15 15;" />
+        <ListView fx:id="userListView"
+                  style="-fx-background-color: transparent; -fx-border-color: transparent;"
+                  VBox.vgrow="ALWAYS" />
+        <Button fx:id="btnDeconnexion" text="Se déconnecter"
+                maxWidth="Infinity" prefHeight="50"
+                onAction="#onDeconnexion"
+                style="-fx-background-color: transparent; -fx-text-fill: #4A7FA7;
+                       -fx-border-color: #1A3D63; -fx-border-width: 1 0 0 0;
+                       -fx-cursor: hand; -fx-font-size: 13px;" />
+    </VBox>
 
-                <!-- VBox DROITE -->
-                <VBox style="-fx-background-color: #0d0d1a;" HBox.hgrow="ALWAYS">
-                    <children>
-
-                        <!-- HEADER -->
-                        <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="12.0" style="-fx-background-color: #1a1a2e; -fx-padding: 0 20;">
-                            <children>
-                                <VBox spacing="2.0">
-                                    <children>
-                                        <Label fx:id="chatTargetLabel" style="-fx-text-fill: #fcf9f9; -fx-font-size: 15px; -fx-font-weight: bold;" text="Sélectionner un utilisateur" />
-                                        <Label fx:id="statusTargetLabel" style="-fx-text-fill: #6a8a80; -fx-font-size: 11px;" text="" />
-                                    </children>
-                                </VBox>
-                            </children>
-                        </HBox>
-
-                        <!-- ZONE MESSAGES -->
-                        <ScrollPane fx:id="scrollPane" fitToWidth="true" style="-fx-background-color: #0d0d1a; -fx-background: #0d0d1a;" VBox.vgrow="ALWAYS">
-                            <content>
-                                <VBox fx:id="messagesBox" spacing="10.0" style="-fx-padding: 15; -fx-background-color: #0d0d1a;" />
-                            </content>
-                        </ScrollPane>
-
-                        <!-- ZONE SAISIE -->
-                        <HBox alignment="CENTER" prefHeight="65.0" spacing="10.0" style="-fx-background-color: #1a1a2e; -fx-padding: 10 15;">
-                            <children>
-                                <TextField fx:id="messageField" onAction="#onEnvoyerMessage" prefHeight="45.0" promptText="Écrire un message..." style="-fx-background-color: #224037; -fx-text-fill: #F2F2F2; -fx-prompt-text-fill: #6a8a80; -fx-background-radius: 22; -fx-padding: 0 15;" HBox.hgrow="ALWAYS">
-                                    <font><Font size="14.0" /></font>
-                                </TextField>
-                                <Button fx:id="btnEnvoyer" onAction="#onEnvoyerMessage" prefHeight="45.0" prefWidth="100.0" style="-fx-background-color: #D99177; -fx-text-fill: #262626; -fx-font-weight: bold; -fx-background-radius: 22; -fx-cursor: hand;" text="Envoyer">
-                                    <font><Font size="14.0" /></font>
-                                </Button>
-                            </children>
-                        </HBox>
-
-                    </children>
-                </VBox>
-
-            </children>
+    <VBox HBox.hgrow="ALWAYS">
+        <HBox alignment="CENTER_LEFT" prefHeight="65" minHeight="65" maxHeight="65"
+              spacing="12"
+              style="-fx-background-color: #0D2240; -fx-padding: 0 20;
+                     -fx-border-color: #1A3D63; -fx-border-width: 0 0 1 0;">
+            <StackPane fx:id="headerAvatar" prefHeight="40" prefWidth="40"
+                       minHeight="40" minWidth="40"
+                       style="-fx-background-color: #1A3D63; -fx-background-radius: 50;">
+                <Label fx:id="headerAvatarLabel" text=""
+                       style="-fx-text-fill: #F6FAFD; -fx-font-size: 14px; -fx-font-weight: bold;" />
+            </StackPane>
+            <VBox spacing="3">
+                <Label fx:id="chatTargetLabel" text="Sélectionner un utilisateur"
+                       style="-fx-text-fill: #F6FAFD; -fx-font-size: 15px; -fx-font-weight: bold;" />
+                <Label fx:id="statusTargetLabel" text=""
+                       style="-fx-text-fill: #4A7FA7; -fx-font-size: 11px;" />
+            </VBox>
         </HBox>
-    </children>
-</StackPane>
+
+        <StackPane VBox.vgrow="ALWAYS">
+            <ImageView fx:id="bgImageView" preserveRatio="false" opacity="0.5" />
+
+            <VBox>
+                <VBox fx:id="welcomeBox" alignment="CENTER" spacing="15"
+                      style="-fx-background-color: transparent;"
+                      VBox.vgrow="ALWAYS">
+                    <Label text="💬" style="-fx-font-size: 55px;" />
+                    <Label text="Bienvenue sur la Messagerie Interne"
+                           style="-fx-text-fill: #F6FAFD; -fx-font-size: 18px; -fx-font-weight: bold;
+                                  -fx-effect: dropshadow(gaussian, #000000, 8, 0.7, 0, 0);" />
+                    <Label text="Sélectionnez un utilisateur pour démarrer une conversation"
+                           style="-fx-text-fill: #B3CFE5; -fx-font-size: 13px;
+                                  -fx-effect: dropshadow(gaussian, #000000, 6, 0.6, 0, 0);" />
+                </VBox>
+                <ScrollPane fx:id="scrollPane" fitToWidth="true"
+                            style="-fx-background-color: transparent; -fx-background: transparent;"
+                            VBox.vgrow="ALWAYS"
+                            visible="false" managed="false">
+                    <content>
+                        <VBox fx:id="messagesBox" spacing="8"
+                              style="-fx-padding: 15; -fx-background-color: transparent;" />
+                    </content>
+                </ScrollPane>
+            </VBox>
+
+            <HBox fx:id="inputBox" alignment="CENTER"
+                  prefHeight="65" maxHeight="65"
+                  spacing="12"
+                  style="-fx-background-color: #0D2240; -fx-padding: 10 20;"
+                  visible="false" managed="false"
+                  StackPane.alignment="BOTTOM_CENTER">
+                <TextField fx:id="messageField" onAction="#onEnvoyerMessage"
+                           prefHeight="44" promptText="Écrire un message..."
+                           style="-fx-background-color: #1A3D63; -fx-text-fill: #F6FAFD;
+                                  -fx-prompt-text-fill: #B3CFE5; -fx-background-radius: 22; -fx-padding: 0 18;"
+                           HBox.hgrow="ALWAYS">
+                    <font><Font size="14" /></font>
+                </TextField>
+                <Button fx:id="btnEnvoyer" text="Envoyer"
+                        onAction="#onEnvoyerMessage"
+                        prefHeight="44" prefWidth="100"
+                        style="-fx-background-color: #4A7FA7; -fx-text-fill: #F6FAFD;
+                               -fx-font-weight: bold; -fx-background-radius: 22; -fx-cursor: hand;">
+                    <font><Font size="14" /></font>
+                </Button>
+            </HBox>
+
+        </StackPane>
+    </VBox>
+</HBox>
