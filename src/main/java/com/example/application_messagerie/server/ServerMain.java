@@ -12,7 +12,7 @@ public class ServerMain {
 
     private static final int PORT = 5555;
 
-    // Map des clients connectés : username → ClientHandler (RG3)
+    // Map des clients connectés : username -→ ClientHandler
     public static final Map<String, ClientHandler> connectedClients = new ConcurrentHashMap<>();
 
     public static void main(String[] args) {
@@ -25,7 +25,7 @@ public class ServerMain {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("[SERVEUR] Nouveau client : " + clientSocket.getInetAddress());
 
-                // RG11 : chaque client dans un thread séparé
+                //   chaque client dans un thread séparé
                 ClientHandler handler = new ClientHandler(clientSocket);
                 Thread thread = new Thread(handler);
                 thread.start();
@@ -36,7 +36,7 @@ public class ServerMain {
         }
     }
 
-    // Envoyer un message à un client connecté
+
     public static void sendToClient(String username, String json) {
         ClientHandler handler = connectedClients.get(username);
         if (handler != null) {
@@ -44,7 +44,6 @@ public class ServerMain {
         }
     }
 
-    // Diffuser à tous les clients connectés
     public static void broadcast(String json) {
         for (ClientHandler handler : connectedClients.values()) {
             handler.sendMessage(json);

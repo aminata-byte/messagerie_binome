@@ -81,7 +81,7 @@
 
     <build>
 
-        <!-- ✅ AJOUT : copie automatique des ressources vers target -->
+        <!--  AJOUT : copie automatique des ressources vers target -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
